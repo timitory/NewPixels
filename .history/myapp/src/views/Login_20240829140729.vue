@@ -1,0 +1,120 @@
+<template>
+    <!-- <div class="w-full px-96 py-11">
+        <div class="flex flex-col w-full  shadow-lg rounded-lg bg-white p-8">
+             <div class="flex flex-col text-center justify-start text-balance">
+                  <p class="text-lg font-bold text-dark">Welcome back to</p>
+                  <p class="text-lg font-bold text-violet">Pixels & Brands </p>
+                  <div class="text-red-700 text-lg font-bold" v-if="error">{{ error }}</div>
+                  
+             </div>
+             <form @submit.prevent="validateForm" class="w-full lg:ml-40 mt-12 lg:mt-0">
+                <h1 class="text-dark text-2xl font-semibold lg:text-center">Welcome back to PaddyCover, 👏🏽</h1>
+                <p class="mt-2 text-charcoal lg:text-center">Log in to your dashboard to continue</p>
+                <div class="mt-4 lg:mt-6">
+                  <label class="text-army font-semibold">Email Address</label>
+                  <input type="email" v-model="user.email" class="mt-2 w-full bg-white py-2 px-3 rounded outline-none border border-gray-200 focus:outline-none focus:ring-1 focus:ring-army focus:border-transparent focus:border-0" required>
+                </div>
+                <div class="mt-4 lg:mt-6">
+                  <label class="text-army font-semibold">Password</label>
+                  <div class="mt-2 bg-white w-full rounded relative">
+                    <input type="password" v-model="user.password" ref="password" class="w-full py-2 px-3 rounded outline-none border border-gray-200 focus:outline-none focus:ring-1 focus:ring-army focus:border-transparent focus:border-0" required>
+                    <font-awesome-icon icon="eye" v-if="showEye" class="absolute eye text-gray-500" @click="showPassword"/>
+                    <font-awesome-icon icon="eye-slash" v-else class="absolute eye text-gray-500" @click="hidePassword"/>
+                  </div>
+                </div>
+                <p class="text-red-500 mt-4">{{errorMsg}}</p>
+                <button class="mt-6 rounded focus:outline-none bg-army py-2 text-center w-full text-white">Proceed</button>
+                <router-link to="/signup" class="inline-block mt-6 text-center rounded focus:outline-none bg-gray-100 text-charcoal py-2 w-full text-white">Create a new account in 2mins</router-link>
+                <div class="mt-4">
+                  <router-link to="/forgotpassword" class="text-army mt-8 md:mt-0 text-sm">Forgot password?</router-link>
+                </div>
+              </form>
+        </div>
+     </div> -->
+   </template>
+   <script>
+import { mapActions, mapMutations } from 'vuex'
+// import SignupValidation from '../Services/SignupValidation'
+// import {CHANGE_LOADER, LOGIN_ACTION} from '../store/storeconstants'
+export default {
+  name:'Login',
+  data(){
+    return {
+      showEye: true,
+      user: {
+        email: "",
+        password: "",
+      },
+      // remember: false,
+      errorMsg: ""
+    }
+  },
+  methods:{
+    validateForm(){
+      this.$store.commit('startLoading')
+      this.$store.dispatch('loginUser', this.user)
+      .then(()=>{
+        // console.log(res)
+        this.$store.commit('endLoading')
+        this.$router.push('/app')
+      })
+      .catch(err=>{
+        this.errorMsg = err.data.message
+        if(err.data.message === 'Please verify account first'){
+          this.$router.push('/verifyotp')
+          this.$store.commit('setError', {status: true, msg: err.data.message})
+        }
+        // this.$store.commit('setError', {status: true, msg: err.response.data.message})
+      })
+    },
+    showPassword(){
+      this.$refs.password.type = 'text'
+      this.showEye = false
+    },
+    hidePassword(){
+      this.$refs.password.type = 'password'
+      this.showEye = true
+    }
+  },
+  created(){
+    if(this.$store.state.homeCollapse == true){
+      this.$store.commit('setHomeCollapse', false)
+    }
+  }
+//   methods:{
+//     ...mapMutations({
+//       LoadSpinner:CHANGE_LOADER
+//     }),
+// ...mapActions('auth',{
+//   signup: LOGIN_ACTION,
+// }),
+//   async Onlogin(){
+//       let Validations = new SignupValidation(
+//         this.email,
+//         this.password,
+//       )
+//       this.errors=Validations.checkValidations();
+//       if('email' in this.errors || 'password' in this.errors){
+//         return false
+//       }
+//       this.error=''
+//       this.LoadSpinner(true)
+//       try {
+//      await this.signup({email:this.email,password:this.password})
+//   } catch(error){
+//     this.error=error.message
+//     this.LoadSpinner(false)
+//   }
+      
+//       this.LoadSpinner(false)
+//       if(this.error){
+//         return false
+//       }
+//       else{
+//       return this.$router.push('/home')
+//       }
+//     } 
+//   }
+  
+}
+</script>
